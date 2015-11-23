@@ -1,0 +1,527 @@
+<!doctype html>
+<html>
+<head>
+    <title>Music Sequencer</title>	
+<style>
+	canvas {border: 1px solid black;}
+	body {font-family: Verdana, Helvetica, sans-serif;}
+</style>
+
+<script>
+//Global Variables
+var canvas;
+var context;
+var songElement; 
+var count = 0;
+var totalMeasures = 0;
+var particles;
+//timers
+var beat1 = setInterval(countOne, 500);
+var beat2 = setInterval(countTwo, 1000);
+var beat3 = setInterval(countThree, 1500);
+var beat4 = setInterval(countFour, 2000);
+var boxTime;
+var circleTime;
+var circleTime2;
+var textTime;
+var stopWTF;
+	
+
+//Initializations ----------------------------------------------------------
+		
+function holdStuff(){
+
+		stopWTF= 666;
+		
+		textTime = setInterval(moveText, 1);
+		
+		boxTime = setInterval(moveBox, 1);
+		circleTime2 = setInterval(cirMove, 1);
+		circleTime = setInterval(cirMove2,1);
+
+}
+
+function init(){
+		canvas = document.getElementById('canvas');
+		context = canvas.getContext("2d");
+		holdStuff();
+	//Making audio element
+		songElement = document.createElement("audio");
+		songElement.setAttribute("src","SoundDUB.mp3");
+		songElement.play();
+		
+	//Did the Window Size Change
+		window.addEventListener('resize', resizeCanvas, false);
+		window.addEventListener('orientationchange', resizeCanvas, false);
+		resizeCanvas();	
+	
+	
+		
+} 
+
+//Timers--------------------------------------------------------------------
+function countOne(){
+	//tracking measures	
+		totalMeasures = totalMeasures + 1;
+		console.log(totalMeasures);
+		count = 1;
+		
+	//clear timers and restart	
+		clearInterval(beat1);
+		beat4 = setInterval(countFour, 2000);
+		
+	//signal functions to make things	
+	
+		makeParticles();
+		makeParticles2();
+		makeBox();
+		
+		
+		if((totalMeasures < 5)){
+	
+		}else{
+		
+		
+		clearInterval(textTime);	
+		}
+		
+	
+		
+}
+function countTwo(){
+		count = 2;
+		clearInterval(beat2);
+		
+		
+		makeParticles();
+		makeParticles2();
+		makeBox();
+		
+		if((totalMeasures < 5)){
+	
+		}else{
+	
+		clearInterval(textTime);	
+		}
+	
+}
+function countThree(){
+		count = 3;
+		clearInterval(beat3);
+		
+	
+		makeParticles();
+		makeParticles2();
+		makeBox();
+		
+		if((totalMeasures < 5)){
+	
+		}else{
+	
+		clearInterval(textTime);	
+		}
+		
+}
+function countFour(){
+	//reset timers
+        beat3 = setInterval(countThree, 1500);
+		beat2 = setInterval(countTwo, 1000);
+		beat1 = setInterval(countOne, 500);
+		
+		count = 4;
+		clearInterval(beat4);
+		
+	
+		makeParticles();
+		makeParticles2();
+		makeBox();
+		
+		if((totalMeasures < 5)){
+		console.log(stopWTF);
+		}else{
+	
+		clearInterval(textTime);	
+		}
+	
+}	
+function resizeCanvas(){
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		
+}
+function fillBackgroundColor(){
+		context.fillStyle = 'black';
+		context.fillRect(0,0, canvas.width, canvas.height);
+}
+	
+//Helper Functions----------------------------------------------------------	
+function degreesToRadians(degrees) {
+		//converts from degrees to radians and returns
+		return (degrees * Math.PI)/180;
+}
+function cirRec(){
+
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.fillStyle = "black";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+
+}	
+//Making Visuals ----------------------------------------------------------
+//Making Squares-----------------------------------------------------------
+function makeBox(){
+	box = [];
+		for(var i = 0; i < 20; i++){
+			box.push(new Box());
+		}
+}
+function Box(){
+
+//Boxes Everywhere----------------------------------------------------------
+	if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+	||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )
+	||(totalMeasures >44)&&(totalMeasures < 53)||(totalMeasures == 54)||(totalMeasures == 58)
+	
+	||(totalMeasures == 30 )||(totalMeasures == 32 )||(totalMeasures == 34 )||(totalMeasures == 36 )){
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*canvas.width/2 +5;
+		this.vy = Math.random()*canvas.height/2 +5;
+	}	
+	
+//Boxes Centered---------------------------------------------------------------
+	if((totalMeasures == 5 )||(totalMeasures == 7 )||(totalMeasures == 9 )||(totalMeasures == 11 )
+	||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+	
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 ))
+	{
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*10-5;
+		this.vy = Math.random()*10-5;
+	}
+		
+//purple, green, blue, gray
+	 var colors2 =['#660066','#cccc00','#0084b3','white'];
+	 if (count == 1){
+		this.color2 = colors2[0];
+	 }else if(count == 2){
+		this.color2 = colors2[1];
+	 }else if(count == 3){
+		this.color2 = colors2[2];
+	 }else if(count == 4){
+		this.color2 = colors2[3];
+	 }else{
+		console.log("no color");
+	 }
+}
+function moveBox(){
+
+    context.globalCompositeOperation = "source-over";
+	context.fillStyle = "rgba(0, 0, 0, 0.3)";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	context.globalCompositeOperation = "source-atop";
+
+//All Boxes everywhere----------------------------------	
+	if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+	||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )
+	||(totalMeasures >44)&&(totalMeasures < 53)||(totalMeasures == 54)||(totalMeasures == 58)
+	
+	
+	||(totalMeasures == 30 )||(totalMeasures == 32 )||(totalMeasures == 34 )||(totalMeasures == 36 ))
+	{
+		for(var i = 0; i < box.length; i++){
+			 var s = box[i];
+			 context.beginPath();
+			 context.rect(s.x,s.y, 80, 80);
+			 context.fillStyle = s.color2;
+			 context.fill();
+			 s.x += s.vx;
+			 s.y += s.vy;
+			 if(s.x < -50) s.x = canvas.width+50;
+			 if(s.y < -50) s.y = canvas.height+50;
+			 if(s.x > canvas.width+50) s.x = -50;
+			 if(s.y > canvas.height+50) s.y = -50;
+			 
+			 s.vx -= 1;
+			 s.vy -= 1;
+		}
+	}
+	
+//Alternate vertical  and horizontal boxes----------------	
+	if ((totalMeasures == 5 )||(totalMeasures == 7 )||(totalMeasures == 9 )||(totalMeasures == 11 )
+	||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+	
+	
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 )){
+	
+		if((count == 4)||(count == 2)){
+			for(var i = 0; i < box.length; i++){
+				 var s = box[i];
+				 context.beginPath();
+				 context.rect(s.x,s.y, 20, 100);
+				 context.fillStyle = s.color2;
+				 context.fill();
+				 s.x += s.vx;
+				 s.y += s.vy;
+			}
+		
+		}else if(totalMeasures > 0){
+		
+			for(var i = 0; i < box.length; i++){
+				 var s = box[i];
+				 context.beginPath();
+				 context.rect(s.x,s.y, 80, 20);
+				 context.fillStyle = s.color2;
+				 context.fill();
+				 s.x += s.vx;
+				 s.y += s.vy;
+			}
+		}
+	}
+}
+
+
+//Circle particles----------------------------------------------------------
+//Random Particles----------------------------------------------------------
+function makeParticles(){
+	
+	particles = [];
+	for(var i = 0; i < 30; i++)
+	{
+		particles.push(new SideCir());
+	}
+ }
+function SideCir(){
+
+//everywhere
+	if((totalMeasures > 4 )&&(totalMeasures < 13 )
+	||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+	||(totalMeasures > 36 )&&(totalMeasures < 45 )
+	||(totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)
+	||(totalMeasures == 46)||(totalMeasures == 48)||(totalMeasures == 50)||(totalMeasures == 52)
+	||(totalMeasures ==60)||(totalMeasures ==61)||(totalMeasures == 56)||(totalMeasures == 60)
+	||(totalMeasures == 14 )||(totalMeasures == 16 )||(totalMeasures == 18 )||(totalMeasures == 20 )
+	||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 )
+	||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*canvas.height/2 +5;
+		this.vy = Math.random()*canvas.height/2 +5;
+	}
+	
+// center
+	if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+	||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )){	
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*10-5;
+		this.vy = Math.random()*10-5;
+	}	
+	
+	var colors =['#a3fb07','#ab5bff','#186db6','#f03c4c'];
+	
+	if (count == 1){
+		this.color = colors[0];
+	}else if(count == 2){
+		this.color = colors[1];
+	}else if(count == 3){
+		this.color = colors[2];
+	}else if(count == 4){
+		this.color = colors[3];
+	}else{
+		console.log("no color");
+	}
+	
+		this.radius = 5;
+}
+function cirMove(){
+
+	context.globalCompositeOperation = "source-over";
+	context.fillStyle = "rgba(0, 0, 0, 0.3)";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	context.globalCompositeOperation = "source-atop";
+
+//Moves the Circles everywhere--------------------------------
+
+	
+		for(var i = 0; i < particles.length; i++){
+		
+			 var p = particles[i];
+			 context.beginPath();
+			 context.arc(p.x, p.y, p.radius, 0, degreesToRadians(360), true);
+			 context.fillStyle = p.color;
+			 context.fill();
+			 p.x += p.vx;
+			 p.y += p.vy;
+			 if(p.x < -50) p.x = canvas.width+50;
+			 if(p.y < -50) p.y = canvas.height+50;
+			 if(p.x > canvas.width+50) p.x = -50;
+			 if(p.y > canvas.height+50) p.y = -50;
+		
+		//makes the Circles slightly bigger, then get smaller again---
+			if((totalMeasures == 5 )||(totalMeasures == 7 )||(totalMeasures == 9 )||(totalMeasures == 11 )
+			||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+			||(totalMeasures == 44)||(totalMeasures == 46)||(totalMeasures == 48)||(totalMeasures == 50)
+			||(totalMeasures ==60)
+			||(totalMeasures ==61)
+			||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 )
+			||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+				 p.radius += 1;
+				 p.radius -+ 2;
+				
+		//for center explosion
+			}else if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+			||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )
+			||(totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)){
+				 p.radius -+ .5;
+			}
+		 }
+
+} 
+
+
+//Side Particles-------------------------------------------------------------
+function cirMove2(){
+
+	if((totalMeasures == 14)||(totalMeasures == 16)||(totalMeasures == 18)||(totalMeasures == 20)
+	||(totalMeasures == 30)||(totalMeasures == 32)||(totalMeasures == 34)||(totalMeasures == 36)
+	||(totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)
+	||(totalMeasures >44)&&(totalMeasures < 53)
+	||(totalMeasures == 54)||(totalMeasures == 56)||(totalMeasures == 58)||(totalMeasures == 60)
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+	
+		context.globalCompositeOperation = "source-over";
+		context.fillStyle = "rgba(0, 0, 0, 0.3)";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		context.globalCompositeOperation = "lighter";
+	 
+		for(var i = 0; i < particles2.length; i++){
+			var p = particles2[i];
+		//LEFT
+			context.beginPath();
+			context.arc(p.x, p.y, p.radius, 0, degreesToRadians(360), true);
+			context.fillStyle = p.color;
+			context.fill();
+		//RIGHT	 
+			context.beginPath();
+			context.arc(p.x2, p.y2, p.radius, 0, degreesToRadians(360), true);
+			context.fillStyle = p.color;
+			context.fill();
+	
+			if ((p.y == canvas.height/2 + 100) || (p.y == canvas.height/2 - 100))
+			p.vy = -p.vy;
+			
+				p.x += p.vx;
+				p.y += p.vy;
+		
+			if((p.y2 == canvas.height/2 + 100) || (p.y2 == canvas.height/2 - 100))
+			p.vy2 = -p.vy2;
+					
+				p.x2 += p.vx2;
+				p.y2 += p.vy2;
+		}
+	}else{
+		clearInterval(cirMove);
+	}  
+}	 
+function SideCir2(){
+
+	if((totalMeasures == 14)||(totalMeasures == 16)||(totalMeasures == 18)||(totalMeasures == 20)
+	||(totalMeasures == 30)||(totalMeasures == 32)||(totalMeasures == 34)||(totalMeasures == 36)
+	||(totalMeasures >44)&&(totalMeasures < 53)||(totalMeasures == 54)||(totalMeasures == 58)){
+	//left circle WHITE
+		this.x = canvas.width/8;
+		this.y = canvas.height/2;
+		this.vx = 0;
+		this.vy = 2;	
+		var colors =["white"];
+		this.color = colors;
+		this.radius = 50;
+		 
+	//right circle WHITE
+		this.x2 = canvas.width/2 + canvas.width/3;
+		this.y2 = canvas.height/2;
+		this.vx2 = 0;
+		this.vy2 = 2;	
+	}else{
+		clearInterval(cirMove2);
+	}
+	
+	if((totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)
+	||(totalMeasures == 56)||(totalMeasures == 60)
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+	//left circle RED
+		this.x = canvas.width/8;
+		this.y = canvas.height/2;
+		this.vx = 0;
+		this.vy = 2;	
+		var colors =["#cc0000"];
+		this.color = colors;
+		this.radius = 100;
+		 
+	//right circle RED
+		this.x2 = canvas.width/2 + canvas.width/3;
+		this.y2 = canvas.height/2;
+		this.vx2 = 0;
+		this.vy2 = 2;	
+	}else{
+		clearInterval(cirMove2);
+	}	
+}
+function makeParticles2() {
+	particles2 = [];
+		for(var i = 0; i < 30; i++){
+			particles2.push(new SideCir2());
+		}
+ }
+
+//Text Generator------------------------------------------------------------ 
+function moveText(){
+
+	x = canvas.width/2;
+	y = canvas.height/2;
+	
+	var lines;
+			if ((count = 1 && count < 4)&&(totalMeasures == 1)){
+				lines = ["Welcome"];
+			}else if((count = 1 && count < 4)&&(totalMeasures == 2)){
+				lines = ["Sit Back"];
+			}else if((count = 1 && count < 4)&&(totalMeasures == 3)){
+				lines = ["And Enjoy"];
+			}else if((count = 1 && count < 4)&&(totalMeasures == 4)){
+				lines = ["Begin Sequencer"];
+			}
+	context.globalCompositeOperation = "source-over";
+	context.fillStyle = "rgba(0, 0, 0, 0.3)";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	context.globalCompositeOperation = "source-atop";
+	
+
+	for(var i = 0; i < lines.length; i++){
+		
+			context.font = "bold 100px serif";
+			context.fillStyle = "white"
+			context.strokeStyle = "#f03c4c";
+			context.globalCompositeOperation = "source-over";
+			context.fillText(lines, x, y);
+			context.lineWidth =5;
+			context.strokeText(lines, x, y);
+			context.textAlign = "center";
+		
+	 }
+}
+
+
+
+window.onload = init;
+</script>
+</head>
+
+        <canvas id="canvas" width="" height=""></canvas>
+
+</body>
+</html>
