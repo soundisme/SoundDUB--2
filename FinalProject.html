@@ -1,0 +1,708 @@
+<!doctype html>
+<html>
+<head>
+    <title>Music Sequencer</title>	
+<style>
+	canvas {border: 1px solid black;}
+	body {font-family: Verdana, Helvetica, sans-serif;
+		   background-color: black;
+	}
+</style>
+
+<script>
+//Global Variables
+var canvas;
+var context;
+var songElement; 
+var count = 0;
+var totalMeasures = 0;
+var particles;
+//timers
+var globalBeat;
+var totalBeats = 0;
+var boxTime;
+var circleTime;
+var circleTime2;
+var textTime;
+var checkItem = 0;
+var oneTouch = 0;
+var meTime;
+var backTime;
+
+//Handle Events ------------------------------------------------------------
+function handleClick(x, y) {
+console.log("clicked");
+window.open("https://soundcloud.com/soundisme-2");
+}
+function onPress_ENTER(){
+    var keyPressed = event.keyCode || event.which;
+      //When enter is pressed
+        if(keyPressed==13){
+			if(checkItem == 0){
+				fillBackgroundColor();
+				initSequence();
+				fillBackgroundColor();
+				checkItem ++;
+				oneTouch++;
+				keyPressed=null;
+			}else if(checkItem == 1){
+				clearInterval(globalBeat);
+				initHaltSequence();
+				checkItem --;
+				oneTouch--;
+				abMe();
+				keyPressed=null;
+			}
+        }else{
+		return false;
+		}
+}
+
+//Main menu stuff ----------------------------------------------------------
+function abMe(){
+
+var img = new Image();
+img.onload = function(){
+	context.globalCompositeOperation = "source-atop";
+	context.drawImage(img, 0, 0, canvas.width-20, canvas.height-1);
+};
+img.src = "AboutMe.png";
+
+}
+function goBack(){
+	if(checkItem == 1){
+	if(totalMeasures > 4){
+		var img2 = new Image();
+		img2.onload = function(){
+			context.globalCompositeOperation = "source-atop";
+			context.drawImage(img2, 0, 0, canvas.width-20, canvas.height-1);
+		};
+		img2.src = "GetOut.png";
+	}
+	}
+}
+
+//Initializations ----------------------------------------------------------
+function init(){
+		canvas = document.getElementById('canvas');
+		context = canvas.getContext("2d");
+	//Did the Window Size Change
+		window.addEventListener('resize', resizeCanvas, false);
+		window.addEventListener('orientationchange', resizeCanvas, false);
+		resizeCanvas();	
+	// when a key is pressed
+		document.addEventListener('keydown',onPress_ENTER, false);
+		if(checkItem == 0){
+			canvas.onclick = function(event){
+			handleClick(event.clientX, event.clientY);
+			};
+		}	
+//while the sequence has not been chosen, ensure sequence off	
+	if(checkItem==0){
+	meTime = setInterval(abMe, 20);
+	}
+	if(totalMeasures > 60){
+		initHaltSequence();
+	}
+//Making audio element for title page
+	if (checkItem == 0){
+		songElement2 = document.createElement("audio");
+		songElement2.setAttribute("src","Deconstruction.mp3");
+		songElement2.volume = 0.8;
+		songElement2.play();
+	}
+	songElement2.onended = function(){
+			songElement2.play();
+	}				
+} 
+function initSequence(){
+	
+		songElement2.pause();
+
+	//clearInterval(beat4);
+		totalBeats =0;
+		clearInterval(globalBeat);
+		clearInterval(meTime);
+		globalBeat = setInterval(manageBeat, 500);
+	
+	//Making audio element
+		songElement = document.createElement("audio");
+		songElement.setAttribute("src","SoundDUB.mp3");
+		songElement.play();
+		
+	//Start the timers
+		moveText();
+		textTime = setInterval(moveText, 20);
+		boxTime = setInterval(moveBox, 1);
+		circleTime2 = setInterval(cirMove, 1);
+		circleTime = setInterval(cirMove2,1);
+		
+	//If song finishes, go back to main screen
+		songElement.onended = function(){
+		initHaltSequence();
+		checkItem --;
+		oneTouch--;
+		fillBackgroundColor();
+		abMe();
+		}
+		
+		
+		
+		
+}	
+function initHaltSequence(){
+	
+		songElement2.play();
+		songElement.pause();
+	
+		clearInterval(globalBeat);
+		clearInterval(textTime);
+		clearInterval(boxTime);
+		clearInterval(circleTime);
+		clearInterval(circleTime2);
+		clearInterval(backTime);
+		//clearInterval(goBack);
+		if(checkItem = 1){
+		count =0;
+		totalMeasures =0;
+	
+		}
+		
+		resizeCanvas();
+
+}
+
+//Timers--------------------------------------------------------------------
+function manageBeat(){
+	totalBeats++;
+	var currentBeat = totalBeats%4;
+		if(currentBeat ==1){
+			countOne();
+		}else if(currentBeat ==2){
+			countTwo();
+		}else if(currentBeat ==3){
+			countThree();
+		}else if(currentBeat ==0){
+			countFour();
+		}else{
+		console.log("shut down");
+		}
+
+}
+function countOne(){
+	//tracking measures	
+		totalMeasures = totalMeasures + 1;
+		console.log(totalMeasures);
+		count = 1;		
+	//signal functions to make things	
+	if(totalMeasures > 4 && totalMeasures <61){
+		makeParticles();
+		makeParticles2();
+		makeBox();
+	}	
+	if((totalMeasures < 5)){
+	}else{
+	clearInterval(textTime);	
+	}		
+}
+function countTwo(){
+	count = 2;	
+	//signal functions to make things	
+	if(totalMeasures > 4 && totalMeasures <61){
+		makeParticles();
+		makeParticles2();
+		makeBox();
+	}	
+	if((totalMeasures < 5)){
+	}else{
+		clearInterval(textTime);	
+	}
+}
+function countThree(){
+	count = 3;	
+	//signal functions to make things	
+	if(totalMeasures > 4 && totalMeasures <61){
+		makeParticles();
+		makeParticles2();
+		makeBox();
+	}	
+	if((totalMeasures < 5)){
+	}else{
+		clearInterval(textTime);	
+	}	
+}
+function countFour(){
+	count = 4;
+	//signal functions to make things	
+	if(totalMeasures > 4 && totalMeasures <61){
+		makeParticles();
+		makeParticles2();
+		makeBox();
+	}
+		
+	if((totalMeasures < 5)){
+	//console.log(stopWTF);
+	}else{
+		clearInterval(textTime);	
+	}
+}	
+
+//Text Generator------------------------------------------------------------ 
+function moveText(){
+
+	x = canvas.width/2;
+	y = canvas.height/2;
+	
+	var lines;
+		if(oneTouch == 1){
+		if ((count = 1 && count < 4)&&(totalMeasures == 1)){
+				clearScreen();
+				lines = ["Welcome"];
+			}else if((count = 1 && count < 4)&&(totalMeasures == 2)){
+				clearScreen();
+				lines = ["Sit Back"];
+			}else if((count = 1 && count < 4)&&(totalMeasures == 3)){
+				clearScreen();
+				lines = ["And Enjoy"];
+			}else if((count = 1 && count < 4)&&(totalMeasures == 4)){
+				clearScreen();
+				lines = ["Begin Sequencer"];
+			}
+			
+		} 
+			
+	
+	if(lines != null){
+		for(var i = 0; i < lines.length; i++){
+		
+			context.font = "bold 100px serif";
+			context.fillStyle = "white"
+			context.strokeStyle = "#f03c4c";
+			context.globalCompositeOperation = "source-over";
+			context.fillText(lines, x, y);
+			context.lineWidth =5;
+			context.strokeText(lines, x, y);
+			context.textAlign = "center";
+		}
+	}
+}	
+//Helper Functions----------------------------------------------------------	
+function clearScreen(){
+		context.globalCompositeOperation = "source-over";
+		context.fillStyle = "rgba(0, 0, 0, 0.3)";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		context.globalCompositeOperation = "lighter";
+}
+function resizeCanvas(){
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+		if(checkItem == 0){
+		abMe();
+		}
+		fillBackgroundColor();
+			
+}
+function fillBackgroundColor(){
+		context.fillStyle = 'black';
+		context.fillRect(0,0, canvas.width, canvas.height);			
+}
+function degreesToRadians(degrees) {
+		//converts from degrees to radians and returns
+		return (degrees * Math.PI)/180;
+}
+	
+//Making Visuals ----------------------------------------------------------
+//Making Squares-----------------------------------------------------------
+function makeBox(){
+	if(totalMeasures > 3){
+		box = [];
+			for(var i = 0; i < 20; i++){
+				box.push(new Box());
+			}
+	}
+}
+function Box(){
+
+//Boxes Everywhere----------------------------------------------------------
+	if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+	||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )
+	||(totalMeasures >44)&&(totalMeasures < 53)||(totalMeasures == 54)||(totalMeasures == 58)
+	
+	||(totalMeasures == 30 )||(totalMeasures == 32 )||(totalMeasures == 34 )||(totalMeasures == 36 )){
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*canvas.width/2 +5;
+		this.vy = Math.random()*canvas.height/2 +5;
+	}	
+	
+//Boxes Centered---------------------------------------------------------------
+	if((totalMeasures == 5 )||(totalMeasures == 7 )||(totalMeasures == 9 )||(totalMeasures == 11 )
+	||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+	
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 ))
+	{
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*10-5;
+		this.vy = Math.random()*10-5;
+	}
+		
+//purple, green, blue, gray
+	 var colors2 =['#660066','#cccc00','#0084b3','white'];
+	 if (count == 1){
+		this.color2 = colors2[0];
+	 }else if(count == 2){
+		this.color2 = colors2[1];
+	 }else if(count == 3){
+		this.color2 = colors2[2];
+	 }else if(count == 4){
+		this.color2 = colors2[3];
+	 }else{
+		console.log("no color");
+	 }
+}
+function moveBox(){
+goBack();
+
+	if (totalMeasures >= 5)
+	{
+	context.globalCompositeOperation = "source-over";
+	context.fillStyle = "rgba(0, 0, 0, 0.3)";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	context.globalCompositeOperation = "source-atop";
+	}
+
+//All Boxes everywhere----------------------------------	
+	if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+	||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )
+	||(totalMeasures >44)&&(totalMeasures < 53)||(totalMeasures == 54)||(totalMeasures == 58)
+	
+	
+	||(totalMeasures == 30 )||(totalMeasures == 32 )||(totalMeasures == 34 )||(totalMeasures == 36 ))
+	{
+		for(var i = 0; i < box.length; i++){
+			var s = box[i];
+			var r = Math.random()*90;
+			var q = Math.random()*5;
+			var m = Math.random()*.5;
+			context.save();
+			context.beginPath();
+			context.translate(s.x, s.y);
+			context.moveTo(0,0-r);
+			for (var e = 0; e < q; e++)
+			{
+				context.rotate(Math.PI / q);
+				context.lineTo(0, 0 - (r*m));
+				context.rotate(Math.PI / q);
+				context.lineTo(0, 0 - r);
+			}
+			context.fillStyle = s.color2;
+			context.fill();
+			context.restore();
+			 
+			 
+			
+			 s.x += s.vx;
+			 s.y += s.vy;
+			 if(s.x < -50) s.x = canvas.width+50;
+			 if(s.y < -50) s.y = canvas.height+50;
+			 if(s.x > canvas.width+50) s.x = -50;
+			 if(s.y > canvas.height+50) s.y = -50;
+			 
+			 s.vx -= 1;
+			 s.vy -= 1;
+		}
+	}
+	
+//Alternate vertical  and horizontal boxes----------------	
+	if ((totalMeasures == 5 )||(totalMeasures == 7 )||(totalMeasures == 9 )||(totalMeasures == 11 )
+	||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+	
+	
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 )){
+	
+		if((count == 4)||(count == 2)){
+			for(var i = 0; i < box.length; i++){
+				 var s = box[i];
+				 
+
+				 context.beginPath();
+				 context.rect(s.x,s.y, 20, 100);
+				 context.fillStyle = s.color2;
+				 context.fill();
+				 s.x += s.vx;
+				 s.y += s.vy;
+			}
+		
+		}else if(totalMeasures > 0){
+		
+			for(var i = 0; i < box.length; i++){
+				 var s = box[i];
+				 context.beginPath();
+				 context.rect(s.x,s.y, 80, 20);
+				 context.fillStyle = s.color2;
+				 context.fill();
+				 s.x += s.vx;
+				 s.y += s.vy;
+			}
+		}
+	}
+}
+
+//Circle particles----------------------------------------------------------
+//Random Particles----------------------------------------------------------
+function cirRec(){
+
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.fillStyle = "black";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+
+}
+function makeParticles(){
+	if(totalMeasures > 3){
+		particles = [];
+		for(var i = 0; i < 30; i++)
+		{
+			particles.push(new SideCir());
+		}
+	}
+}
+function SideCir(){
+if(totalMeasures > 3){
+//everywhere
+
+
+
+	if((totalMeasures > 4 )&&(totalMeasures < 13 )
+	||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+	||(totalMeasures > 36 )&&(totalMeasures < 45 )
+	||(totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)
+	||(totalMeasures == 46)||(totalMeasures == 48)||(totalMeasures == 50)||(totalMeasures == 52)
+	||(totalMeasures ==60)||(totalMeasures ==61)||(totalMeasures == 56)||(totalMeasures == 60)
+	||(totalMeasures == 14 )||(totalMeasures == 16 )||(totalMeasures == 18 )||(totalMeasures == 20 )
+	||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 )
+	||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*canvas.height/2 +5;
+		this.vy = Math.random()*canvas.height/2 +5;
+	}
+	
+// center
+	if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+	||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )){	
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.vx = Math.random()*10-5;
+		this.vy = Math.random()*10-5;
+	}	
+	
+	var colors =['#a3fb07','#ab5bff','#186db6','#f03c4c'];
+	
+	if (count == 1){
+		this.color = colors[0];
+	}else if(count == 2){
+		this.color = colors[1];
+	}else if(count == 3){
+		this.color = colors[2];
+	}else if(count == 4){
+		this.color = colors[3];
+	}else{
+		console.log("no color");
+	}
+	
+		this.radius = 5;
+		}
+}
+function cirMove(){
+goBack();
+
+if (totalMeasures >= 5)
+	{
+	context.globalCompositeOperation = "source-over";
+	context.fillStyle = "rgba(0, 0, 0, 0.3)";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	context.globalCompositeOperation = "source-atop";
+	}
+//Moves the Circles everywhere--------------------------------
+
+		if(particles != null){
+		for(var i = 0; i < particles.length; i++){
+		
+			 var p = particles[i];
+			 context.beginPath();
+			 context.arc(p.x, p.y, p.radius, 0, degreesToRadians(360), true);
+			 context.fillStyle = p.color;
+			 context.fill();
+			 p.x += p.vx;
+			 p.y += p.vy;
+			 if(p.x < -50) p.x = canvas.width+50;
+			 if(p.y < -50) p.y = canvas.height+50;
+			 if(p.x > canvas.width+50) p.x = -50;
+			 if(p.y > canvas.height+50) p.y = -50;
+		
+		//makes the Circles slightly bigger, then get smaller again---
+			if((totalMeasures == 5 )||(totalMeasures == 7 )||(totalMeasures == 9 )||(totalMeasures == 11 )
+			||(totalMeasures == 21 )||(totalMeasures == 23 )||(totalMeasures == 25 )||(totalMeasures == 27 )
+			||(totalMeasures == 44)||(totalMeasures == 46)||(totalMeasures == 48)||(totalMeasures == 50)
+			||(totalMeasures ==60)
+			||(totalMeasures ==61)
+			||(totalMeasures == 29 )||(totalMeasures == 31 )||(totalMeasures == 33 )||(totalMeasures == 35 )
+			||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+				 p.radius += 1;
+				 p.radius -+ 2;
+				
+		//for center explosion
+			}else if((totalMeasures == 6 )||(totalMeasures == 8 )||(totalMeasures == 10 )||(totalMeasures == 12 )
+			||(totalMeasures == 22 )||(totalMeasures == 24 )||(totalMeasures == 26 )||(totalMeasures == 28 )
+			||(totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)){
+				 p.radius -+ .5;
+			}
+		 }
+		 }
+		 
+
+} 
+
+//Side Particles-------------------------------------------------------------
+function makeParticles2() {
+	if(totalMeasures > 3){
+		particles2 = [];
+			for(var i = 0; i < 30; i++){
+				particles2.push(new SideCir2());
+			}
+	}
+
+}
+function SideCir2(){
+
+	if((totalMeasures == 14)||(totalMeasures == 16)||(totalMeasures == 18)||(totalMeasures == 20)
+	||(totalMeasures == 30)||(totalMeasures == 32)||(totalMeasures == 34)||(totalMeasures == 36)
+	||(totalMeasures >44)&&(totalMeasures < 53)||(totalMeasures == 54)||(totalMeasures == 58)){
+	//left circle WHITE
+		this.x = canvas.width/8;
+		this.y = canvas.height/2;
+		this.vx = 0;
+		this.vy = 2;	
+		var colors =["white"];
+		this.color = colors;
+		this.radius = 50;
+		 
+	//right circle WHITE
+		this.x2 = canvas.width/2 + canvas.width/3;
+		this.y2 = canvas.height/2;
+		this.vx2 = 0;
+		this.vy2 = 2;	
+	}else{
+		clearInterval(cirMove2);
+	}
+	
+	if((totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)
+	||(totalMeasures == 56)||(totalMeasures == 60)
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+	//left circle RED
+		this.x = canvas.width/8;
+		this.y = canvas.height/2;
+		this.vx = 0;
+		this.vy = 2;	
+		var colors =["#cc0000"];
+		this.color = colors;
+		this.radius = 100;
+		 
+	//right circle RED
+		this.x2 = canvas.width/2 + canvas.width/3;
+		this.y2 = canvas.height/2;
+		this.vx2 = 0;
+		this.vy2 = 2;	
+	}else{
+		clearInterval(cirMove2);
+	}	
+}
+function cirMove2(){
+goBack();
+	if((totalMeasures == 14)||(totalMeasures == 16)||(totalMeasures == 18)||(totalMeasures == 20)
+	||(totalMeasures == 30)||(totalMeasures == 32)||(totalMeasures == 34)||(totalMeasures == 36)
+	||(totalMeasures == 45)||(totalMeasures == 47)||(totalMeasures == 49)||(totalMeasures == 51)
+	||(totalMeasures >44)&&(totalMeasures < 53)
+	||(totalMeasures == 54)||(totalMeasures == 56)||(totalMeasures == 58)||(totalMeasures == 60)
+	||(totalMeasures == 13 )||(totalMeasures == 15 )||(totalMeasures == 17 )||(totalMeasures == 19 )
+	||(totalMeasures == 53 )||(totalMeasures == 55 )||(totalMeasures == 57 )||(totalMeasures == 59 )){
+	
+	if (totalMeasures >= 5)
+	{
+		context.globalCompositeOperation = "source-over";
+		context.fillStyle = "rgba(0, 0, 0, 0.3)";
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		context.globalCompositeOperation = "lighter";
+		}
+	 
+		for(var i = 0; i < particles2.length; i++){
+			var p = particles2[i];
+		//LEFT
+		
+		var p = particles2[i];
+			var r = Math.random()+90;
+			var q = 12;
+			var m = .2;
+			context.save();
+			context.beginPath();
+			context.translate(p.x, p.y);
+			context.moveTo(0,0-r);
+			for (var e = 0; e < q; e++)
+			{
+				context.rotate(Math.PI / q);
+				context.lineTo(0, 0 - (r*m));
+				context.rotate(Math.PI / q);
+				context.lineTo(0, 0 - r);
+			}
+			context.fillStyle = p.color;
+			context.fill();
+			context.restore();
+		
+		//RIGHT	 
+		
+			context.save();
+			context.beginPath();
+			context.translate(p.x2, p.y2);
+			context.moveTo(0,0-r);
+			for (var e = 0; e < q; e++)
+			{
+				context.rotate(Math.PI / q);
+				context.lineTo(0, 0 - (r*m));
+				context.rotate(Math.PI / q);
+				context.lineTo(0, 0 - r);
+			}
+			context.fillStyle = p.color;
+			context.fill();
+			context.restore();
+			
+	
+			if ((p.y == canvas.height/2 + 100) || (p.y == canvas.height/2 - 100))
+			p.vy = -p.vy;
+			
+				p.x += p.vx;
+				p.y += p.vy;
+		
+			if((p.y2 == canvas.height/2 + 100) || (p.y2 == canvas.height/2 - 100))
+			p.vy2 = -p.vy2;
+					
+				p.x2 += p.vx2;
+				p.y2 += p.vy2;
+		}
+	}else{
+		clearInterval(cirMove);
+	}  
+}	 
+
+
+window.onload = init;
+</script>
+</head>
+<body>
+        <canvas id="canvas" width="1920" height="1080"></canvas>
+
+</body>
+</html>
